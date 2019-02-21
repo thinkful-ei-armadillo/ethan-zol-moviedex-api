@@ -29,53 +29,37 @@ app.use((req, res, next) => {
 
 app.get('/movie', (req, res) => {
 
-  let search = null;
-  let type = null;
+  let results = MOVIES;
 
-  if (req.query.type && ['genre', 'country', 'avg_vote'].includes(req.query.type.toLowerCase())) {
-    type = req.query.type.toLowerCase();
+  if (req.query.name) {
+    results = results.filter((m) => {
+
+      return m.film_title.toLowerCase().includes(req.query.name.toLowerCase());
+    });
   }
 
-  if (req.query.search) {
-    search = req.query.search;
+  if (req.query.country) {
+    results = results.filter((m) => {
+
+      return m.country.toLowerCase().includes(req.query.country.toLowerCase());
+    });
   }
 
+  if (req.query.genre) {
+    results = results.filter((m) => {
 
-  if (search && type) {
-
-    let filtered = [];
-
-    if (type === 'genre') {
-
-      filtered = MOVIES.filter((m) => {
-        return m.genre.toLowerCase().includes(search.toLowerCase());
-      });
-
-      return res.json(filtered);
-    }
-
-    if (type === 'country') {
-
-      filtered = MOVIES.filter((m) => {
-
-        return m.country.toLowerCase().includes(search.toLowerCase());
-      });
-
-      return res.json(filtered);
-    }
-
-    if (type === 'avg_vote') {
-
-      filtered = MOVIES.filter((m) => {
-
-        return m.avg_vote >= Number.parseInt(search, 10);
-      });
-
-      return res.json(filtered);
-    }
+      return m.genre.toLowerCase().includes(req.query.genre.toLowerCase());
+    });
   }
 
-  res.json(MOVIES);
+  if (req.query.avg_vote) {
+    results = results.filter((m) => {
+
+      return m.avg_vote >= Number.parseFloat(req.query.avg_vote);
+    });
+  }
+
+  res.json(results);
 });
 
 
