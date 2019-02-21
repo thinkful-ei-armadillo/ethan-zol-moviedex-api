@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const morgan  = require('morgan');
 const cors    = require('cors');
@@ -10,7 +12,20 @@ app.use(morgan('dev'));
 app.use(helmet());
 app.use(cors());
 
-/// auth
+app.use((req, res, next) => {
+
+  let auth = req.get('Authorization');
+
+  if (!auth) {
+    return res.status(401).json({ error: 'Unauthorized request' });
+  }
+
+  if (auth.split(' ')[1] !== process.env.API_TOKEN) {
+    return res.status(401).json({ error: 'Unauthorized request' });
+  }
+
+  next();
+});
 
 app.get('/movie', (req, res) => {
 
